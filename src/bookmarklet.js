@@ -13,7 +13,7 @@
     return el;
   };
 
-  // localStorage can throw (blocked storage, sandboxed frames), so keep a copy in memory to fall back on
+  /* localStorage can throw (blocked storage, sandboxed frames), so keep a copy in memory to fall back on */
   const memoryStore = {};
   const STATE_KEY = 'sagistic.state.v1';
   const UI_KEY = 'sagistic.ui.v1';
@@ -50,7 +50,7 @@
   };
   const THEME_MODES = ['auto', 'neon', 'ink', 'paper'];
 
-  // Expects an rgb()/rgba() string. Pages that use oklch(), lab() or color() backgrounds will be misjudged.
+  /* Expects an rgb()/rgba() string. Pages that use oklch(), lab() or color() backgrounds will be misjudged. */
   const luminance = color => {
     const nums = color.match(/[\d.]+/g);
     if (!nums || nums.length < 3) return null;
@@ -72,9 +72,9 @@
       : { bg: `hsl(${siteHue} 40% 97%)`, fg: '#1d1d26', mut: `hsl(${siteHue} 10% 42%)`, acc: `hsl(${siteHue} 80% 45%)`, line: `hsl(${siteHue} 25% 86%)` };
   };
 
-  // Constructable stylesheets aren't blocked by a strict CSP the way an injected <style> tag can be.
-  // The <style> fallback is for older browsers.
-  // Returns a function that removes the sheet again.
+  /* Constructable stylesheets aren't blocked by a strict CSP the way an injected <style> tag can be. */
+  /* The <style> fallback is for older browsers. */
+  /* Returns a function that removes the sheet again. */
   const addSheet = (target, css) => {
     try {
       const sheet = new CSSStyleSheet();
@@ -203,8 +203,8 @@ a[data-sg][target=_blank]{outline-style:dashed!important}
     const levelBefore = level(state.xp);
     task.done = !task.done;
     if (task.done) {
-      // XP is kept on the task so un-completing takes back exactly what was granted,
-      // even if the priority was changed in between
+      /* XP is kept on the task so un-completing takes back exactly what was granted, */
+      /* even if the priority was changed in between */
       task.xp = 10 * (1 + task.pri);
       state.xp += task.xp;
       burst(rowEl);
@@ -268,7 +268,7 @@ a[data-sg][target=_blank]{outline-style:dashed!important}
     if (e.key === 'Enter' && !e.isComposing) { addTask(questInput.value); questInput.value = ''; }
     else if (e.key === 'Escape') setOpen(false);
   });
-  // Typing in the widget shouldn't trigger the page's own keyboard shortcuts
+  /* Typing in the widget shouldn't trigger the page's own keyboard shortcuts */
   for (const type of ['keydown', 'keyup', 'keypress']) host.addEventListener(type, e => e.stopPropagation());
 
   const clean = () => {
@@ -280,7 +280,7 @@ a[data-sg][target=_blank]{outline-style:dashed!important}
     toast(count ? `Cleared ${count}` : 'Nothing to clear');
   };
 
-  // Quests are stored per site (localStorage is per origin), so Carry/Drop moves them between sites via the clipboard
+  /* Quests are stored per site (localStorage is per origin), so Carry/Drop moves them between sites via the clipboard */
   const carry = async () => {
     const payload = JSON.stringify({
       sagistic: 1,
@@ -351,7 +351,7 @@ a[data-sg][target=_blank]{outline-style:dashed!important}
     renderTools();
   };
 
-  // Debounced because busy pages can fire a lot of mutations in a row
+  /* Debounced because busy pages can fire a lot of mutations in a row */
   let scanTimer;
   const linkObserver = new MutationObserver(() => { clearTimeout(scanTimer); scanTimer = setTimeout(scan, 200); });
   let removeRadarStyles = null;
@@ -366,7 +366,7 @@ a[data-sg][target=_blank]{outline-style:dashed!important}
     }
   };
   const radarOn = () => {
-    // The links live in the page, not in the shadow root, so their highlight styles go on the document
+    /* The links live in the page, not in the shadow root, so their highlight styles go on the document */
     removeRadarStyles = removeRadarStyles || addSheet(document, RADAR_CSS);
     linkObserver.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['href'] });
     scan();
@@ -407,7 +407,7 @@ a[data-sg][target=_blank]{outline-style:dashed!important}
     renderTools();
   };
 
-  // updatePanel is false while dragging, so the panel doesn't flip sides mid-drag
+  /* updatePanel is false while dragging, so the panel doesn't flip sides mid-drag */
   const place = (updatePanel = true) => {
     ui.x = Math.min(Math.max(8, ui.x), innerWidth - 60);
     ui.y = Math.min(Math.max(8, ui.y), innerHeight - 60);
@@ -433,7 +433,7 @@ a[data-sg][target=_blank]{outline-style:dashed!important}
       el.setPointerCapture(e.pointerId);
 
       const onMove = ev => {
-        // Ignore tiny movements so a slightly shaky click still counts as a click
+        /* Ignore tiny movements so a slightly shaky click still counts as a click */
         if (!moved && Math.hypot(ev.clientX - startX, ev.clientY - startY) < 5) return;
         moved = true;
         ui.x = originX + ev.clientX - startX;
@@ -466,7 +466,7 @@ a[data-sg][target=_blank]{outline-style:dashed!important}
     }
   };
 
-  // e.code rather than e.key: with Alt held, some layouts (macOS) produce a different character
+  /* e.code rather than e.key: with Alt held, some layouts (macOS) produce a different character */
   const onKeydown = e => {
     if (!e.altKey || !e.shiftKey) return;
     if (e.code === 'KeyS') { e.preventDefault(); setOpen(!ui.open); }
@@ -484,7 +484,7 @@ a[data-sg][target=_blank]{outline-style:dashed!important}
   addEventListener('storage', onStorage);
   addEventListener('resize', onResize);
 
-  // Polling is a simple way to catch route changes in single-page apps without patching history.pushState
+  /* Polling is a simple way to catch route changes in single-page apps without patching history.pushState */
   let lastHref = location.href, lastPageKey = pageKey(), lastDark = pageIsDark();
   const pollTimer = setInterval(() => {
     if (location.href !== lastHref) {
@@ -522,11 +522,11 @@ a[data-sg][target=_blank]{outline-style:dashed!important}
     ui.x = innerWidth - 76;
     ui.y = innerHeight - 76;
   }
-  // Attached to <html> rather than <body> so pages that rebuild their body don't remove it
+  /* Attached to <html> rather than <body> so pages that rebuild their body don't remove it */
   document.documentElement.append(host);
   applyTheme();
   render();
-  setOpen(true); // always opens when the script runs; the saved ui.open only matters for toggle()
+  setOpen(true); /* always opens when the script runs; the saved ui.open only matters for toggle() */
   if (ui.radar) radarOn();
   window[ID] = { toggle: () => setOpen(!ui.open), eject };
   toast('Sagistic online', 1200);
